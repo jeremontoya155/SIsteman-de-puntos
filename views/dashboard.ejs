@@ -1,0 +1,208 @@
+<!-- Dashboard Header -->
+<div class="dashboard-header dashboard-animate">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="dashboard-title">
+                <i class="fas fa-tachometer-alt me-3"></i>
+                Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Panel de control del sistema de puntos empresarial</p>
+        </div>
+        <div class="dashboard-date">
+            <i class="fas fa-calendar me-2"></i>
+            <%= new Date().toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }) %>
+        </div>
+    </div>
+</div>
+
+<!-- Error Alert (si existe) -->
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert alert-warning dashboard-animate" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <%= error %>
+</div>
+<% } %>
+
+<!-- Estadísticas principales -->
+<div class="stats-grid dashboard-animate">
+    <div class="stat-card clients">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-number"><%= stats.clientes || 0 %></div>
+        <div class="stat-label">Clientes Activos</div>
+        <div class="stat-change">
+            <i class="fas fa-arrow-up text-success"></i>
+            <span class="text-success">Registrados</span>
+        </div>
+    </div>
+    
+    <div class="stat-card categories">
+        <div class="stat-icon">
+            <i class="fas fa-tags"></i>
+        </div>
+        <div class="stat-number"><%= stats.categorias || 0 %></div>
+        <div class="stat-label">Categorías</div>
+        <div class="stat-change">
+            <i class="fas fa-layer-group text-info"></i>
+            <span class="text-info">Configuradas</span>
+        </div>
+    </div>
+    
+    <div class="stat-card promotions">
+        <div class="stat-icon">
+            <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="stat-number"><%= stats.promociones || 0 %></div>
+        <div class="stat-label">Promociones Activas</div>
+        <div class="stat-change">
+            <i class="fas fa-chart-line text-warning"></i>
+            <span class="text-warning">Vigentes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card whatsapp">
+        <div class="stat-icon">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Sistema Listo</div>
+        <div class="stat-change">
+            <i class="fas fa-check-circle text-success"></i>
+            <span class="text-success">Operativo</span>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas -->
+<div class="quick-actions dashboard-animate">
+    <h5 class="quick-actions-title">
+        <i class="fas fa-bolt me-2"></i>
+        Acciones Rápidas
+    </h5>
+    <div class="action-grid">
+        <a href="/clientes/nuevo" class="action-btn clients">
+            <div class="action-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="action-label">Nuevo Cliente</div>
+        </a>
+        
+        <a href="/categorias/nueva" class="action-btn categories">
+            <div class="action-icon">
+                <i class="fas fa-tag"></i>
+            </div>
+            <div class="action-label">Nueva Categoría</div>
+        </a>
+        
+        <a href="/promociones/nueva" class="action-btn promotions">
+            <div class="action-icon">
+                <i class="fas fa-megaphone"></i>
+            </div>
+            <div class="action-label">Nueva Promoción</div>
+        </a>
+        
+        <a href="/whatsapp" class="action-btn whatsapp">
+            <div class="action-icon">
+                <i class="fab fa-whatsapp"></i>
+            </div>
+            <div class="action-label">Enviar WhatsApp</div>
+        </a>
+    </div>
+</div>
+
+<!-- Información del sistema -->
+<div class="info-grid dashboard-animate">
+    <div class="info-card">
+        <div class="info-card-header">
+            <h5 class="info-card-title">
+                <i class="fas fa-info-circle me-2"></i>
+                Funcionalidades del Sistema
+            </h5>
+        </div>
+        <div class="info-card-body">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-star text-warning"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Sistema de Puntos</h6>
+                    <small>Acumula puntos por compras según categoría de cliente</small>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-users text-primary"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Gestión de Clientes</h6>
+                    <small>Administra tu base de clientes organizados por categorías</small>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fab fa-whatsapp text-success"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Mensajería WhatsApp</h6>
+                    <small>Envía promociones masivas segmentadas por categoría</small>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn text-danger"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Promociones Segmentadas</h6>
+                    <small>Crea promociones específicas para cada tipo de cliente</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-card-header">
+            <h5 class="info-card-title">
+                <i class="fas fa-cog me-2"></i>
+                Configuración Inicial
+            </h5>
+        </div>
+        <div class="info-card-body">
+            <div class="dashboard-alert alert-info">
+                <i class="fas fa-lightbulb me-2"></i>
+                <strong>Pasos para comenzar:</strong>
+            </div>
+            
+            <ol class="steps-list">
+                <li>
+                    <strong>Configura las categorías</strong> de clientes según tu negocio
+                </li>
+                <li>
+                    <strong>Añade tus clientes</strong> y asígnales categorías apropiadas
+                </li>
+                <li>
+                    <strong>Crea promociones</strong> específicas para cada categoría
+                </li>
+                <li>
+                    <strong>Envía mensajes</strong> de promociones vía WhatsApp
+                </li>
+            </ol>
+            
+            <div class="dashboard-alert alert-warning">
+                <i class="fas fa-database me-2"></i>
+                <small>
+                    <strong>Nota:</strong> Asegúrate de haber configurado la base de datos PostgreSQL 
+                    ejecutando el archivo <code>database.sql</code>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

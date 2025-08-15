@@ -1,0 +1,367 @@
+<!-- Categorías Header -->
+<div class="categorias-header categoria-animate">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="categorias-title">
+                <i class="fas fa-tag me-3"></i>
+                Nueva Categoría
+            </h1>
+            <p class="categorias-subtitle">Crea una nueva categoría de clientes con sus beneficios</p>
+        </div>
+        <a href="/categorias" class="whatsapp-action-btn">
+            <i class="fas fa-arrow-left me-2"></i>
+            Volver a Lista
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="nueva-categoria-form categoria-animate">
+            <div class="form-header">
+                <h5 class="form-title">
+                    <i class="fas fa-cog me-2"></i>
+                    Configuración de la Categoría
+                </h5>
+            </div>
+            <div class="form-body">
+                <% if (error) { %>
+                    <div class="dashboard-alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <form method="POST" action="/categorias">
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Información Básica
+                        </h6>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombre" class="form-label">Nombre de la Categoría *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" 
+                                       placeholder="Ej: VIP, Frecuente, Nuevo..." required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <input type="text" class="form-control" id="descripcion" name="descripcion" 
+                                       placeholder="Describe brevemente esta categoría">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Beneficios y Puntos -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-star me-2"></i>
+                            Beneficios y Puntos
+                        </h6>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="descuento_porcentaje" class="form-label">
+                                    <i class="fas fa-percentage me-1 text-success"></i>
+                                    Descuento Automático (%)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="descuento_porcentaje" 
+                                           name="descuento_porcentaje" min="0" max="100" step="0.1" 
+                                           value="0" placeholder="0.0">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">
+                                    Descuento que se aplicará automáticamente en las compras
+                                </small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="puntos_por_peso" class="form-label">
+                                    <i class="fas fa-coins me-1 text-warning"></i>
+                                    Puntos por Peso Gastado
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="puntos_por_peso" 
+                                           name="puntos_por_peso" min="0" step="0.01" 
+                                           value="1.00" placeholder="1.00">
+                                    <span class="input-group-text">pts</span>
+                                </div>
+                                <small class="text-muted">
+                                    Cantidad de puntos que ganará por cada peso gastado
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vista Previa de Beneficios -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-calculator me-2"></i>
+                            Vista Previa de Beneficios
+                        </h6>
+                        
+                        <div class="preview-benefits">
+                            <div class="benefit-example">
+                                <div class="benefit-item original">
+                                    <div class="benefit-number">$1,000</div>
+                                    <div class="benefit-label">Compra Original</div>
+                                </div>
+                                <div class="benefit-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="benefit-item discount">
+                                    <div class="benefit-number" id="ejemplo-descuento">$0</div>
+                                    <div class="benefit-label">Descuento</div>
+                                </div>
+                                <div class="benefit-item points">
+                                    <div class="benefit-number" id="ejemplo-puntos">0 pts</div>
+                                    <div class="benefit-label">Puntos Ganados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Categorías de Ejemplo -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Plantillas Sugeridas
+                        </h6>
+                        
+                        <div class="templates-grid">
+                            <button type="button" class="template-btn categoria-ejemplo" 
+                                    data-nombre="Bronce" data-desc="Cliente nuevo" data-descuento="0" data-puntos="1">
+                                <div class="template-icon">
+                                    <i class="fas fa-medal" style="color: #cd7f32;"></i>
+                                </div>
+                                <div class="template-title">Bronce</div>
+                                <div class="template-desc">Cliente nuevo</div>
+                                <div class="template-benefits">0% desc. | 1x puntos</div>
+                            </button>
+                            
+                            <button type="button" class="template-btn categoria-ejemplo" 
+                                    data-nombre="Plata" data-desc="Cliente frecuente" data-descuento="5" data-puntos="1.25">
+                                <div class="template-icon">
+                                    <i class="fas fa-medal" style="color: #c0c0c0;"></i>
+                                </div>
+                                <div class="template-title">Plata</div>
+                                <div class="template-desc">Cliente frecuente</div>
+                                <div class="template-benefits">5% desc. | 1.25x puntos</div>
+                            </button>
+                            
+                            <button type="button" class="template-btn categoria-ejemplo" 
+                                    data-nombre="Oro" data-desc="Cliente VIP" data-descuento="10" data-puntos="1.5">
+                                <div class="template-icon">
+                                    <i class="fas fa-medal" style="color: #ffd700;"></i>
+                                </div>
+                                <div class="template-title">Oro</div>
+                                <div class="template-desc">Cliente VIP</div>
+                                <div class="template-benefits">10% desc. | 1.5x puntos</div>
+                            </button>
+                            
+                            <button type="button" class="template-btn categoria-ejemplo" 
+                                    data-nombre="Platino" data-desc="Cliente Premium" data-descuento="15" data-puntos="2">
+                                <div class="template-icon">
+                                    <i class="fas fa-crown" style="color: #e5e4e2;"></i>
+                                </div>
+                                <div class="template-title">Platino</div>
+                                <div class="template-desc">Cliente Premium</div>
+                                <div class="template-benefits">15% desc. | 2x puntos</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/categorias" class="form-btn secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="form-btn primary">
+                            <i class="fas fa-save me-2"></i>
+                            Guardar Categoría
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.preview-benefits {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.benefit-example {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.benefit-item {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-width: 150px;
+    flex: 1;
+}
+
+.benefit-item.original {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.benefit-item.discount {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.benefit-item.points {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.benefit-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.benefit-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.benefit-arrow {
+    font-size: 1.5rem;
+    color: #11998e;
+}
+
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.template-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.template-btn:hover {
+    border-color: #11998e;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.template-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.template-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.template-desc {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.template-benefits {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .benefit-example {
+        flex-direction: column;
+    }
+    
+    .benefit-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .templates-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .templates-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Actualizar ejemplos dinámicamente
+function actualizarEjemplos() {
+    const descuento = parseFloat(document.getElementById('descuento_porcentaje').value) || 0;
+    const puntosPorPeso = parseFloat(document.getElementById('puntos_por_peso').value) || 0;
+    
+    const compraOriginal = 1000;
+    const montoDescuento = compraOriginal * (descuento / 100);
+    const puntosGanados = compraOriginal * puntosPorPeso;
+    
+    document.getElementById('ejemplo-descuento').textContent = `$${montoDescuento.toFixed(0)}`;
+    document.getElementById('ejemplo-puntos').textContent = `${puntosGanados.toFixed(0)} pts`;
+}
+
+// Event listeners
+document.getElementById('descuento_porcentaje').addEventListener('input', actualizarEjemplos);
+document.getElementById('puntos_por_peso').addEventListener('input', actualizarEjemplos);
+
+// Botones de ejemplo
+document.querySelectorAll('.categoria-ejemplo').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('nombre').value = this.dataset.nombre;
+        document.getElementById('descripcion').value = this.dataset.desc;
+        document.getElementById('descuento_porcentaje').value = this.dataset.descuento;
+        document.getElementById('puntos_por_peso').value = this.dataset.puntos;
+        actualizarEjemplos();
+        
+        // Efecto visual
+        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+    });
+});
+
+// Inicializar ejemplos
+actualizarEjemplos();
+
+// Agregar estilo para template seleccionado
+const style = document.createElement('style');
+style.textContent = `
+    .template-btn.selected {
+        border-color: #11998e !important;
+        background: linear-gradient(135deg, #f0fffe 0%, #e6fffa 100%) !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(17, 153, 142, 0.2);
+    }
+`;
+document.head.appendChild(style);
+</script>

@@ -1,0 +1,261 @@
+<!-- Promociones Header -->
+<div class="promociones-header promocion-animate">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="promociones-title">
+                <i class="fas fa-bullhorn me-3"></i>
+                Gestión de Promociones
+            </h1>
+            <p class="promociones-subtitle">Crea y administra promociones segmentadas por categoría</p>
+        </div>
+        <a href="/promociones/nueva" class="whatsapp-action-btn">
+            <i class="fas fa-plus me-2"></i>
+            Nueva Promoción
+        </a>
+    </div>
+</div>
+
+<!-- Lista de promociones -->
+<div class="promociones-container">
+    <% if (promociones.length === 0) { %>
+        <div class="empty-state promocion-animate">
+            <div class="empty-state-icon">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3 class="empty-state-title">No hay promociones creadas</h3>
+            <p class="empty-state-description">
+                Las promociones te permiten enviar mensajes específicos a categorías de clientes.<br>
+                Crea tu primera promoción para comenzar a comunicarte con tus clientes.
+            </p>
+            <a href="/promociones/nueva" class="empty-state-btn">
+                <i class="fas fa-plus me-2"></i>
+                Crear Primera Promoción
+            </a>
+        </div>
+    <% } else { %>
+        <% promociones.forEach((promocion, index) => { %>
+            <% 
+                const fechaInicio = new Date(promocion.fecha_inicio);
+                const fechaFin = new Date(promocion.fecha_fin);
+                const hoy = new Date();
+                const isVigente = promocion.activa && hoy >= fechaInicio && hoy <= fechaFin;
+                const isProxima = promocion.activa && hoy < fechaInicio;
+                const isVencida = promocion.activa && hoy > fechaFin;
+            %>
+            <div class="promocion-card promocion-animate" style="animation-delay: <%= (index * 0.1) %>s;">
+                <div class="promocion-header">
+                    <div class="promocion-icon">
+                        <i class="fas fa-megaphone"></i>
+                    </div>
+                    <div class="promocion-title-section">
+                        <h5 class="promocion-title"><%= promocion.titulo %></h5>
+                        <p class="promocion-id">ID: #<%= promocion.id %></p>
+                    </div>
+                    <div class="promocion-status">
+                        <% if (isVigente) { %>
+                            <span class="status-badge vigente">Vigente</span>
+                        <% } else if (isProxima) { %>
+                            <span class="status-badge proxima">Próxima</span>
+                        <% } else if (isVencida) { %>
+                            <span class="status-badge vencida">Vencida</span>
+                        <% } else { %>
+                            <span class="status-badge inactiva">Inactiva</span>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="promocion-body">
+                    <% if (promocion.descripcion) { %>
+                        <p class="promocion-description">
+                            <%= promocion.descripcion.length > 120 ? 
+                                promocion.descripcion.substring(0, 120) + '...' : 
+                                promocion.descripcion %>
+                        </p>
+                    <% } %>
+                    
+                    <div class="promocion-meta">
+                        <div class="promocion-categoria">
+                            <i class="fas fa-tag"></i>
+                            <span><%= promocion.categoria_nombre || 'Todas las categorías' %></span>
+                        </div>
+                        
+                        <div class="promocion-fechas">
+                            <div>
+                                <i class="fas fa-play-circle me-1"></i>
+                                <strong>Inicio:</strong><br>
+                                <%= new Date(promocion.fecha_inicio).toLocaleDateString('es-ES') %>
+                            </div>
+                            <div>
+                                <i class="fas fa-stop-circle me-1"></i>
+                                <strong>Fin:</strong><br>
+                                <%= new Date(promocion.fecha_fin).toLocaleDateString('es-ES') %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="promocion-preview">
+                        <div class="preview-label">
+                            <i class="fab fa-whatsapp"></i>
+                            Vista previa WhatsApp
+                        </div>
+                        <div class="whatsapp-message">
+                            <% 
+                                const mensaje = promocion.mensaje_personalizado || 
+                                    `¡Hola [NOMBRE]! 📢 ${promocion.titulo}: ${promocion.descripcion}`;
+                                const mensajeEjemplo = mensaje.replace(/\[NOMBRE\]/g, 'Juan Pérez').substring(0, 100);
+                            %>
+                            <%= mensajeEjemplo %><%= mensaje.length > 100 ? '...' : '' %>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="promocion-actions">
+                    <button class="promocion-btn detalle" 
+                            onclick="verDetalle(<%= promocion.id %>)"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalDetalle">
+                        <i class="fas fa-eye"></i>
+                        Ver
+                    </button>
+                    <% if (isVigente || isProxima) { %>
+                        <a href="/whatsapp?promocion=<%= promocion.id %>" 
+                           class="promocion-btn enviar">
+                            <i class="fab fa-whatsapp"></i>
+                            Enviar
+                        </a>
+                    <% } else { %>
+                        <button class="promocion-btn enviar" disabled>
+                            <i class="fab fa-whatsapp"></i>
+                            Enviar
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+
+<!-- Modal para detalle de promoción -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-bullhorn me-2"></i>
+                    Detalle de Promoción
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-detalle-content">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cerrar
+                </button>
+                <button type="button" class="btn btn-success" onclick="enviarPromocionActual()">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Enviar WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let promocionActual = null;
+
+function verDetalle(promocionId) {
+    const promociones = <%- JSON.stringify(promociones) %>;
+    const promocion = promociones.find(p => p.id === promocionId);
+    promocionActual = promocion;
+    
+    if (promocion) {
+        const fechaInicio = new Date(promocion.fecha_inicio);
+        const fechaFin = new Date(promocion.fecha_fin);
+        const hoy = new Date();
+        const isVigente = promocion.activa && hoy >= fechaInicio && hoy <= fechaFin;
+        
+        const statusClass = isVigente ? 'vigente' : 
+                           (hoy < fechaInicio ? 'proxima' : 'vencida');
+        const statusText = isVigente ? 'Vigente' : 
+                          (hoy < fechaInicio ? 'Próxima' : 'Vencida');
+        
+        const mensaje = promocion.mensaje_personalizado || 
+            `¡Hola [NOMBRE]! 📢 ${promocion.titulo}: ${promocion.descripcion}`;
+        
+        const mensajeEjemplo = mensaje.replace(/\[NOMBRE\]/g, 'Juan Pérez');
+        
+        document.getElementById('modal-detalle-content').innerHTML = `
+            <div class="row">
+                <div class="col-md-8">
+                    <h6 class="text-primary mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Información General
+                    </h6>
+                    <div class="mb-3">
+                        <strong>Título:</strong><br>
+                        <span class="text-muted">${promocion.titulo}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Descripción:</strong><br>
+                        <span class="text-muted">${promocion.descripcion || 'Sin descripción'}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Categoría:</strong><br>
+                        <span class="badge bg-info">${promocion.categoria_nombre || 'Todas las categorías'}</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Período:</strong><br>
+                        <span class="text-muted">
+                            ${fechaInicio.toLocaleDateString('es-ES')} - ${fechaFin.toLocaleDateString('es-ES')}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-success mb-3">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Estado
+                    </h6>
+                    <div class="text-center">
+                        <span class="status-badge ${statusClass} fs-6">${statusText}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h6 class="text-success mb-3">
+                <i class="fab fa-whatsapp me-2"></i>
+                Vista Previa del Mensaje
+            </h6>
+            <div class="whatsapp-preview-container">
+                <div class="whatsapp-message">
+                    ${mensajeEjemplo}
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    [NOMBRE] será reemplazado automáticamente por el nombre de cada cliente
+                </small>
+            </div>
+        `;
+    }
+}
+
+function enviarPromocionActual() {
+    if (promocionActual) {
+        window.location.href = `/whatsapp?promocion=${promocionActual.id}`;
+    }
+}
+
+// Animaciones
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.promocion-animate');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+        }, index * 100);
+    });
+});
+</script>

@@ -1,0 +1,649 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fab fa-whatsapp me-2 text-success"></i>
+                    Mensajería WhatsApp - VenomBot
+                </h2>
+                <p class="text-muted mb-0">Envía promociones masivas a tus clientes por categoría</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/whatsapp/historial" class="btn btn-outline-info">
+                    <i class="fas fa-history me-2"></i>
+                    Historial
+                </a>
+                <a href="/promociones/nueva" class="btn btn-outline-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Nueva Promoción
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estado de WhatsApp -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert border-0" id="whatsapp-status-alert">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h6 class="alert-heading mb-2">
+                        <i class="fab fa-whatsapp me-2"></i>
+                        Estado de WhatsApp - VenomBot
+                    </h6>
+                    <p class="mb-0" id="status-message">
+                        <span class="badge me-2" id="status-badge">Verificando...</span>
+                        <span id="status-text">Verificando conexión...</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-success" id="btn-connect" onclick="conectarWhatsApp()">
+                        <i class="fas fa-power-off me-1"></i>
+                        Conectar WhatsApp
+                    </button>
+                    <button class="btn btn-danger" id="btn-disconnect" onclick="desconectarWhatsApp()" style="display: none;">
+                        <i class="fas fa-power-off me-1"></i>
+                        Desconectar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Conectar WhatsApp
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qr-container">
+                    <div class="spinner-border text-success mb-3" role="status">
+                        <span class="visually-hidden">Generando QR...</span>
+                    </div>
+                    <p>Generando código QR...</p>
+                </div>
+                <div class="mt-3">
+                    <h6>Instrucciones:</h6>
+                    <ol class="text-start">
+                        <li>Abre WhatsApp en tu teléfono</li>
+                        <li>Ve a Configuración > Dispositivos vinculados</li>
+                        <li>Toca "Vincular un dispositivo"</li>
+                        <li>Escanea este código QR</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cancelarConexion()">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (promociones.length === 0) { %>
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fab fa-whatsapp fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay promociones disponibles</h5>
+            <p class="text-muted mb-3">Necesitas crear promociones antes de poder enviar mensajes</p>
+            <a href="/promociones/nueva" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                Crear Primera Promoción
+            </a>
+        </div>
+    </div>
+<% } else { %>
+    <!-- Promociones Disponibles -->
+    <div class="row">
+        <% promociones.forEach(promocion => { %>
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="fas fa-bullhorn me-2 text-primary"></i>
+                                    <%= promocion.titulo %>
+                                </h5>
+                                <small class="text-muted">ID: #<%= promocion.id %></small>
+                            </div>
+                            <div>
+                                <% 
+                                    const fechaInicio = new Date(promocion.fecha_inicio);
+                                    const fechaFin = new Date(promocion.fecha_fin);
+                                    const hoy = new Date();
+                                    const isVigente = hoy >= fechaInicio && hoy <= fechaFin;
+                                %>
+                                <% if (isVigente && promocion.activa) { %>
+                                    <span class="badge bg-success">Vigente</span>
+                                <% } else if (hoy < fechaInicio && promocion.activa) { %>
+                                    <span class="badge bg-info">Próxima</span>
+                                <% } else if (hoy > fechaFin) { %>
+                                    <span class="badge bg-warning">Vencida</span>
+                                <% } else { %>
+                                    <span class="badge bg-secondary">Inactiva</span>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <% if (promocion.descripcion) { %>
+                            <p class="card-text small mb-3">
+                                <%= promocion.descripcion.length > 80 ? 
+                                    promocion.descripcion.substring(0, 80) + '...' : 
+                                    promocion.descripcion %>
+                            </p>
+                        <% } %>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-tag me-1"></i>
+                                    <%= promocion.categoria_nombre || 'Todas' %>
+                                </span>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <%= new Date(promocion.fecha_inicio).toLocaleDateString('es-ES') %> - 
+                                    <%= new Date(promocion.fecha_fin).toLocaleDateString('es-ES') %>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Vista previa del mensaje -->
+                        <div class="bg-light p-2 rounded mb-3" style="font-size: 0.85em;">
+                            <div class="d-flex align-items-start">
+                                <i class="fab fa-whatsapp text-success me-2 mt-1"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="text-primary">Vista previa:</strong><br>
+                                    <span class="text-muted">
+                                        <%= (promocion.mensaje_personalizado || 
+                                             `¡Hola [Nombre]! 📢 ${promocion.titulo}: ${promocion.descripcion}`)
+                                             .substring(0, 60) + '...' %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success flex-fill enviar-btn" 
+                                    data-promocion-id="<%= promocion.id %>"
+                                    <% if (!isVigente || !promocion.activa) { %>disabled<% } %>>
+                                <i class="fab fa-whatsapp me-1"></i>
+                                <span class="d-none d-sm-inline">Enviar</span>
+                            </button>
+                            <button class="btn btn-outline-primary detalle-btn" 
+                                    data-promocion-id="<%= promocion.id %>"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalDetalle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        
+                        <% if (!isVigente || !promocion.activa) { %>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <% if (!promocion.activa) { %>
+                                        Promoción inactiva
+                                    <% } else if (hoy < fechaInicio) { %>
+                                        Promoción aún no vigente
+                                    <% } else { %>
+                                        Promoción vencida
+                                    <% } %>
+                                </small>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Información sobre VenomBot
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                Cómo funciona el envío
+                            </h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    VenomBot se conecta a WhatsApp Web
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Los mensajes se envían solo a clientes que aceptaron promociones
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Envío controlado con delays para evitar bloqueos
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Se registra cada mensaje enviado para seguimiento
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success">
+                                <i class="fab fa-whatsapp me-1"></i>
+                                Configuración
+                            </h6>
+                            <div class="alert alert-success">
+                                <small>
+                                    <strong>VenomBot configurado y listo.</strong> 
+                                    Para usar:
+                                </small>
+                                <ol class="mt-2 mb-0 small">
+                                    <li>Haz clic en "Conectar WhatsApp"</li>
+                                    <li>Escanea el código QR con tu teléfono</li>
+                                    <li>¡Listo para enviar mensajes!</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- Modal para ver detalle de promoción -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye me-2"></i>
+                    Detalle de la Promoción
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalle-promocion">
+                <!-- Aquí se cargará el detalle -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" id="btn-enviar-modal">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Enviar Promoción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de envío -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fab fa-whatsapp me-2 text-success"></i>
+                    Confirmar Envío
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
+                    <h6>¿Estás seguro de enviar esta promoción?</h6>
+                    <p class="text-muted" id="mensaje-confirmacion">
+                        Se enviará a todos los clientes de la categoría seleccionada
+                    </p>
+                    <div class="alert alert-warning">
+                        <small>
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Asegúrate de que WhatsApp esté conectado antes de enviar
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmar-envio">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Sí, Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const promociones = <%- JSON.stringify(promociones) %>;
+let promocionSeleccionada = null;
+let statusInterval = null;
+
+// Inicializar página
+document.addEventListener('DOMContentLoaded', function() {
+    verificarEstadoWhatsApp();
+    startStatusPolling();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Botones de enviar
+    document.querySelectorAll('.enviar-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const promocionId = parseInt(this.dataset.promocionId);
+            enviarPromocion(promocionId);
+        });
+    });
+
+    // Botones de detalle
+    document.querySelectorAll('.detalle-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const promocionId = parseInt(this.dataset.promocionId);
+            verDetallePromocion(promocionId);
+        });
+    });
+
+    // Confirmar envío
+    document.getElementById('confirmar-envio').addEventListener('click', confirmarEnvio);
+}
+
+// Verificar estado de WhatsApp
+async function verificarEstadoWhatsApp() {
+    try {
+        const response = await fetch('/whatsapp/status');
+        const status = await response.json();
+        actualizarEstadoUI(status);
+    } catch (error) {
+        console.error('Error verificando estado:', error);
+        actualizarEstadoUI({ status: 'error', message: 'Error de comunicación' });
+    }
+}
+
+// Actualizar UI según estado
+function actualizarEstadoUI(status) {
+    const alert = document.getElementById('whatsapp-status-alert');
+    const badge = document.getElementById('status-badge');
+    const text = document.getElementById('status-text');
+    const btnConnect = document.getElementById('btn-connect');
+    const btnDisconnect = document.getElementById('btn-disconnect');
+
+    // Resetear clases
+    alert.className = 'alert border-0';
+    
+    switch(status.status) {
+        case 'connected':
+            alert.classList.add('alert-success');
+            badge.className = 'badge bg-success me-2';
+            badge.textContent = 'Conectado';
+            text.textContent = status.message || 'WhatsApp conectado y listo para enviar mensajes';
+            btnConnect.style.display = 'none';
+            btnDisconnect.style.display = 'inline-block';
+            break;
+            
+        case 'connecting':
+        case 'qr-ready':
+            alert.classList.add('alert-warning');
+            badge.className = 'badge bg-warning text-dark me-2';
+            badge.textContent = 'Conectando';
+            text.textContent = status.message || 'Conectando...';
+            btnConnect.style.display = 'none';
+            btnDisconnect.style.display = 'inline-block';
+            
+            if (status.status === 'qr-ready' && status.qrCode) {
+                mostrarQR(status.qrCode);
+            }
+            break;
+            
+        case 'error':
+            alert.classList.add('alert-danger');
+            badge.className = 'badge bg-danger me-2';
+            badge.textContent = 'Error';
+            text.textContent = status.message || 'Error de conexión';
+            btnConnect.style.display = 'inline-block';
+            btnDisconnect.style.display = 'none';
+            break;
+            
+        default: // disconnected
+            alert.classList.add('alert-info');
+            badge.className = 'badge bg-secondary me-2';
+            badge.textContent = 'Desconectado';
+            text.textContent = status.message || 'WhatsApp no está conectado. Haz clic en conectar para comenzar.';
+            btnConnect.style.display = 'inline-block';
+            btnDisconnect.style.display = 'none';
+    }
+}
+
+// Conectar WhatsApp
+async function conectarWhatsApp() {
+    const btn = document.getElementById('btn-connect');
+    const originalHtml = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Conectando...';
+    
+    try {
+        const response = await fetch('/whatsapp/connect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('Conexión iniciada');
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error conectando:', error);
+        alert('Error al conectar WhatsApp: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    }
+}
+
+// Desconectar WhatsApp
+async function desconectarWhatsApp() {
+    if (!confirm('¿Estás seguro de desconectar WhatsApp?')) return;
+    
+    try {
+        const response = await fetch('/whatsapp/disconnect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            cerrarQR();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error desconectando:', error);
+        alert('Error al desconectar: ' + error.message);
+    }
+}
+
+// Mostrar QR Code
+function mostrarQR(qrCode) {
+    const qrContainer = document.getElementById('qr-container');
+    qrContainer.innerHTML = `
+        <img src="${qrCode}" alt="QR Code" class="img-fluid mb-3" style="max-width: 256px;">
+        <p class="text-success">Escanea este código con WhatsApp</p>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+    modal.show();
+}
+
+// Cancelar conexión
+function cancelarConexion() {
+    desconectarWhatsApp();
+    cerrarQR();
+}
+
+// Cerrar modal QR
+function cerrarQR() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('qrModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+// Polling del estado
+function startStatusPolling() {
+    statusInterval = setInterval(verificarEstadoWhatsApp, 3000);
+}
+
+function stopStatusPolling() {
+    if (statusInterval) {
+        clearInterval(statusInterval);
+    }
+}
+
+function verDetallePromocion(promocionId) {
+    const promocion = promociones.find(p => p.id === promocionId);
+    
+    if (promocion) {
+        const mensaje = promocion.mensaje_personalizado || 
+            `¡Hola [NOMBRE]! 📢 ${promocion.titulo}: ${promocion.descripcion}`;
+        
+        document.getElementById('detalle-promocion').innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary">Información General</h6>
+                    <table class="table table-sm">
+                        <tr><td><strong>Título:</strong></td><td>${promocion.titulo}</td></tr>
+                        <tr><td><strong>Categoría:</strong></td><td>${promocion.categoria_nombre || 'Todas'}</td></tr>
+                        <tr><td><strong>Vigencia:</strong></td><td>${new Date(promocion.fecha_inicio).toLocaleDateString('es-ES')} al ${new Date(promocion.fecha_fin).toLocaleDateString('es-ES')}</td></tr>
+                        <tr><td><strong>Estado:</strong></td><td>${promocion.activa ? '<span class="badge bg-success">Activa</span>' : '<span class="badge bg-secondary">Inactiva</span>'}</td></tr>
+                    </table>
+                    
+                    ${promocion.descripcion ? `
+                    <h6 class="text-primary mt-3">Descripción</h6>
+                    <p class="text-muted">${promocion.descripcion}</p>
+                    ` : ''}
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-success">
+                        <i class="fab fa-whatsapp me-1"></i>
+                        Vista Previa del Mensaje
+                    </h6>
+                    <div class="bg-light p-3 rounded">
+                        <div class="d-flex align-items-start">
+                            <div class="avatar bg-success text-white rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; font-size: 18px;">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="bg-white p-3 rounded shadow-sm">
+                                    <strong class="text-primary">${promocion.titulo}</strong><br>
+                                    <div class="mt-2">${mensaje.replace(/\[NOMBRE\]/g, 'Juan Pérez')}</div>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class="fas fa-clock me-1"></i>
+                                        Ejemplo para "Juan Pérez"
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Configurar botón de envío del modal
+        const btnEnviarModal = document.getElementById('btn-enviar-modal');
+        btnEnviarModal.onclick = () => {
+            bootstrap.Modal.getInstance(document.getElementById('modalDetalle')).hide();
+            enviarPromocion(promocionId);
+        };
+    }
+}
+
+function enviarPromocion(promocionId) {
+    const promocion = promociones.find(p => p.id === promocionId);
+    if (!promocion) return;
+    
+    promocionSeleccionada = promocionId;
+    
+    document.getElementById('mensaje-confirmacion').textContent = 
+        `Se enviará la promoción "${promocion.titulo}" a todos los clientes de la categoría "${promocion.categoria_nombre || 'Todas'}".`;
+    
+    new bootstrap.Modal(document.getElementById('modalConfirmacion')).show();
+}
+
+async function confirmarEnvio() {
+    if (!promocionSeleccionada) return;
+    
+    const btn = document.getElementById('confirmar-envio');
+    const originalHtml = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+    
+    try {
+        const response = await fetch('/whatsapp/enviar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                promocion_id: promocionSeleccionada
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('modalConfirmacion')).hide();
+            
+            // Mostrar éxito
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>¡Éxito!</strong> ${result.mensaje}
+                ${result.detalles ? `<br><small>Total: ${result.detalles.total}, Exitosos: ${result.detalles.exitosos}, Fallidos: ${result.detalles.fallidos}</small>` : ''}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('.row').prepend(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 10000);
+            
+        } else {
+            throw new Error(result.error);
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al enviar la promoción: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        promocionSeleccionada = null;
+    }
+}
+
+// Limpiar al salir de la página
+window.addEventListener('beforeunload', function() {
+    stopStatusPolling();
+});
+</script>

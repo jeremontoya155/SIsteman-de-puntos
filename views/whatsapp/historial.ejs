@@ -1,0 +1,265 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-history me-2 text-primary"></i>
+                    Historial de Mensajes
+                </h2>
+                <p class="text-muted mb-0">Registro de todos los mensajes enviados por WhatsApp</p>
+            </div>
+            <a href="/whatsapp" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            Últimos 100 Mensajes Enviados
+        </h5>
+    </div>
+    <div class="card-body">
+        <% if (mensajes.length === 0) { %>
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay mensajes en el historial</h5>
+                <p class="text-muted mb-3">Los mensajes enviados aparecerán aquí</p>
+                <a href="/whatsapp" class="btn btn-primary">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Ir a Mensajería
+                </a>
+            </div>
+        <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Promoción</th>
+                            <th>Mensaje</th>
+                            <th>Estado</th>
+                            <th>Fecha Envío</th>
+                            <th>Registrado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% mensajes.forEach(mensaje => { %>
+                            <tr>
+                                <td><strong>#<%= mensaje.id %></strong></td>
+                                <td>
+                                    <% if (mensaje.cliente_nombre) { %>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-initial bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 12px;">
+                                                <%= mensaje.cliente_nombre.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <strong><%= mensaje.cliente_nombre %></strong>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="text-muted">Cliente eliminado</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (mensaje.cliente_telefono) { %>
+                                        <i class="fab fa-whatsapp text-success me-1"></i>
+                                        <%= mensaje.cliente_telefono %>
+                                    <% } else { %>
+                                        <span class="text-muted">N/A</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (mensaje.promocion_titulo) { %>
+                                        <span class="badge bg-info"><%= mensaje.promocion_titulo %></span>
+                                    <% } else { %>
+                                        <span class="text-muted">Promoción eliminada</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="mensaje-preview" style="max-width: 200px;">
+                                        <small class="text-muted">
+                                            <%= mensaje.mensaje.length > 60 ? 
+                                                mensaje.mensaje.substring(0, 60) + '...' : 
+                                                mensaje.mensaje %>
+                                        </small>
+                                        <% if (mensaje.mensaje.length > 60) { %>
+                                            <button class="btn btn-sm btn-outline-secondary ms-1" 
+                                                    onclick="verMensajeCompleto('<%= mensaje.id %>')"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalMensaje">
+                                                <i class="fas fa-expand-alt"></i>
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (mensaje.estado === 'enviado') { %>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Enviado
+                                        </span>
+                                    <% } else if (mensaje.estado === 'error') { %>
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times me-1"></i>
+                                            Error
+                                        </span>
+                                    <% } else if (mensaje.estado === 'simulado') { %>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-vial me-1"></i>
+                                            Simulado
+                                        </span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <%= mensaje.estado %>
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (mensaje.enviado_at) { %>
+                                        <small class="text-success">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <%= new Date(mensaje.enviado_at).toLocaleDateString('es-ES') %><br>
+                                            <%= new Date(mensaje.enviado_at).toLocaleTimeString('es-ES') %>
+                                        </small>
+                                    <% } else { %>
+                                        <span class="text-muted">No enviado</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <%= new Date(mensaje.created_at).toLocaleDateString('es-ES') %><br>
+                                        <%= new Date(mensaje.created_at).toLocaleTimeString('es-ES') %>
+                                    </small>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="mt-4">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="text-primary">
+                                    <%= mensajes.length %>
+                                </h5>
+                                <small class="text-muted">Total Mensajes</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="text-success">
+                                    <%= mensajes.filter(m => m.estado === 'enviado').length %>
+                                </h5>
+                                <small class="text-muted">Enviados</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="text-danger">
+                                    <%= mensajes.filter(m => m.estado === 'error').length %>
+                                </h5>
+                                <small class="text-muted">Errores</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="text-warning">
+                                    <%= mensajes.filter(m => m.estado === 'simulado').length %>
+                                </h5>
+                                <small class="text-muted">Simulados</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Modal para ver mensaje completo -->
+<div class="modal fade" id="modalMensaje" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fab fa-whatsapp me-2 text-success"></i>
+                    Mensaje Completo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="bg-light p-3 rounded">
+                    <div class="d-flex align-items-start">
+                        <div class="avatar bg-success text-white rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px; font-size: 18px;">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <div id="mensaje-completo-contenido">
+                                    <!-- Aquí se cargará el mensaje completo -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const mensajes = <%- JSON.stringify(mensajes) %>;
+
+function verMensajeCompleto(mensajeId) {
+    const mensaje = mensajes.find(m => m.id == mensajeId);
+    if (mensaje) {
+        document.getElementById('mensaje-completo-contenido').innerHTML = `
+            <div class="mb-2">
+                <strong>Para:</strong> ${mensaje.cliente_nombre || 'Cliente'} (${mensaje.cliente_telefono || 'N/A'})
+            </div>
+            <div class="mb-2">
+                <strong>Promoción:</strong> ${mensaje.promocion_titulo || 'N/A'}
+            </div>
+            <div class="mb-2">
+                <strong>Estado:</strong> 
+                ${mensaje.estado === 'enviado' ? '<span class="badge bg-success">Enviado</span>' : 
+                  mensaje.estado === 'error' ? '<span class="badge bg-danger">Error</span>' : 
+                  mensaje.estado === 'simulado' ? '<span class="badge bg-warning text-dark">Simulado</span>' : 
+                  '<span class="badge bg-secondary">' + mensaje.estado + '</span>'}
+            </div>
+            <div class="mb-2">
+                <strong>Fecha:</strong> ${mensaje.enviado_at ? new Date(mensaje.enviado_at).toLocaleString('es-ES') : 'No enviado'}
+            </div>
+            <hr>
+            <div class="mb-2">
+                <strong>Mensaje:</strong>
+            </div>
+            <div class="p-2 bg-light rounded">
+                ${mensaje.mensaje.replace(/\n/g, '<br>')}
+            </div>
+        `;
+    }
+}
+</script>

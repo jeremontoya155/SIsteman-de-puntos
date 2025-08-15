@@ -1,0 +1,328 @@
+<!-- Nueva Promoción Header -->
+<div class="nueva-promocion-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="nueva-promocion-title">
+                <i class="fas fa-megaphone me-3"></i>
+                Nueva Promoción
+            </h1>
+            <p class="nueva-promocion-subtitle">Crea una promoción específica para una categoría de clientes</p>
+        </div>
+        <a href="/promociones" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>
+            Volver a Lista
+        </a>
+    </div>
+</div>
+
+<!-- Formulario de nueva promoción -->
+<div class="promocion-form-container">
+    <div class="promocion-form-card">
+        <% if (error) { %>
+            <div class="form-alert error">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form method="POST" action="/promociones" class="promocion-form">
+            <!-- Información Básica -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Información de la Promoción
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="titulo" class="form-label">Título de la Promoción *</label>
+                        <input type="text" class="form-input" id="titulo" name="titulo" 
+                               placeholder="Ej: Descuento especial de temporada" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria_id" class="form-label">Categoría Objetivo *</label>
+                        <select class="form-select" id="categoria_id" name="categoria_id" required>
+                            <option value="">Seleccionar categoría...</option>
+                            <% categorias.forEach(categoria => { %>
+                                <option value="<%= categoria.id %>">
+                                    <%= categoria.nombre %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <small class="form-help">Solo los clientes de esta categoría recibirán la promoción</small>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="descripcion" class="form-label">Descripción Detallada</label>
+                        <textarea class="form-textarea" id="descripcion" name="descripcion" rows="3"
+                                  placeholder="Describe los detalles de la promoción, condiciones, productos incluidos, etc."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fechas de Vigencia -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-calendar"></i>
+                        Período de Vigencia
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio *</label>
+                        <input type="date" class="form-input" id="fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin *</label>
+                        <input type="date" class="form-input" id="fecha_fin" name="fecha_fin" required>
+                    </div>
+                </div>
+                
+                <div class="date-preview" id="datePreview" style="display: none;">
+                    <div class="date-range">
+                        <div class="date-start">
+                            <i class="fas fa-play-circle"></i>
+                            <span id="previewStart">-</span>
+                        </div>
+                        <div class="date-separator">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="date-end">
+                            <i class="fas fa-stop-circle"></i>
+                            <span id="previewEnd">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mensaje WhatsApp -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fab fa-whatsapp"></i>
+                        Mensaje de WhatsApp
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="mensaje_personalizado" class="form-label">Mensaje Personalizado</label>
+                        <textarea class="form-textarea whatsapp-textarea" id="mensaje_personalizado" 
+                                  name="mensaje_personalizado" rows="4"
+                                  placeholder="¡Hola [NOMBRE]! 🎉 Te tenemos una oferta especial..."></textarea>
+                        <div class="form-help">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Usa <code>[NOMBRE]</code> para incluir el nombre del cliente automáticamente.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plantillas de mensaje -->
+                <div class="templates-section">
+                    <h6 class="templates-title">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        Plantillas predefinidas
+                    </h6>
+                    <div class="templates-grid">
+                        <button type="button" class="template-btn" 
+                                data-mensaje="¡Hola [NOMBRE]! 🎉 Tenemos una promoción especial solo para ti. ¡No te la pierdas!">
+                            <i class="fas fa-percent"></i>
+                            <span>Promoción General</span>
+                        </button>
+                        
+                        <button type="button" class="template-btn" 
+                                data-mensaje="¡[NOMBRE]! 🛍️ Como cliente VIP, tienes descuentos exclusivos esta semana. ¡Aprovecha!">
+                            <i class="fas fa-crown"></i>
+                            <span>Descuento VIP</span>
+                        </button>
+                        
+                        <button type="button" class="template-btn" 
+                                data-mensaje="📦 ¡Hola [NOMBRE]! Ya llegó el stock que esperabas. Ven a verlo antes que se agote.">
+                            <i class="fas fa-box"></i>
+                            <span>Llegada de Stock</span>
+                        </button>
+                        
+                        <button type="button" class="template-btn" 
+                                data-mensaje="🎂 ¡Feliz cumpleaños [NOMBRE]! Tenemos un regalo especial para ti. ¡Pasa a retirarlo!">
+                            <i class="fas fa-birthday-cake"></i>
+                            <span>Cumpleaños</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vista Previa WhatsApp -->
+            <div class="whatsapp-preview-section">
+                <div class="preview-header">
+                    <h6 class="preview-title">
+                        <i class="fab fa-whatsapp me-2"></i>
+                        Vista Previa del Mensaje
+                    </h6>
+                </div>
+                
+                <div class="whatsapp-preview-container">
+                    <div class="whatsapp-header">
+                        <div class="whatsapp-contact">
+                            <div class="contact-avatar">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">Tu Negocio</div>
+                                <div class="contact-status">en línea</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="whatsapp-messages">
+                        <div class="whatsapp-message sent" id="whatsapp-preview">
+                            <div class="message-content">
+                                <div class="message-title" id="preview-title">
+                                    <strong>🎯 [Título de la promoción]</strong>
+                                </div>
+                                <div class="message-text" id="preview-message">
+                                    Completa los campos para ver la vista previa del mensaje
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message-time">Enviado ahora</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="info-section">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="info-content">
+                        <h6>Consejos para promociones efectivas</h6>
+                        <ul>
+                            <li>Usa emojis para hacer el mensaje más atractivo 🎉</li>
+                            <li>Incluye una llamada a la acción clara</li>
+                            <li>Menciona la fecha límite de la promoción</li>
+                            <li>Personaliza el mensaje según la categoría del cliente</li>
+                            <li>Mantén el mensaje corto y directo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions">
+                <a href="/promociones" class="cancel-btn">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </a>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save me-2"></i>
+                    Crear Promoción
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Función para actualizar la vista previa
+function actualizarVistaPrevia() {
+    const titulo = document.getElementById('titulo').value || '[Título de la promoción]';
+    const descripcion = document.getElementById('descripcion').value || '[Descripción]';
+    const mensajePersonalizado = document.getElementById('mensaje_personalizado').value;
+    
+    let mensaje;
+    if (mensajePersonalizado) {
+        mensaje = mensajePersonalizado.replace(/\[NOMBRE\]/g, 'Juan Pérez');
+    } else {
+        mensaje = `¡Hola Juan Pérez! 📢 ${titulo}: ${descripcion}`;
+    }
+    
+    document.getElementById('preview-title').innerHTML = `<strong>🎯 ${titulo}</strong>`;
+    document.getElementById('preview-message').textContent = mensaje;
+}
+
+// Actualizar preview de fechas
+function actualizarPreviewFechas() {
+    const fechaInicio = document.getElementById('fecha_inicio').value;
+    const fechaFin = document.getElementById('fecha_fin').value;
+    const preview = document.getElementById('datePreview');
+    
+    if (fechaInicio && fechaFin) {
+        const inicio = new Date(fechaInicio).toLocaleDateString('es-ES');
+        const fin = new Date(fechaFin).toLocaleDateString('es-ES');
+        
+        document.getElementById('previewStart').textContent = inicio;
+        document.getElementById('previewEnd').textContent = fin;
+        
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+// Event listeners para actualizar vista previa
+document.getElementById('titulo').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('descripcion').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('mensaje_personalizado').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('fecha_inicio').addEventListener('change', actualizarPreviewFechas);
+document.getElementById('fecha_fin').addEventListener('change', actualizarPreviewFechas);
+
+// Botones de plantillas
+document.querySelectorAll('.template-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('mensaje_personalizado').value = this.dataset.mensaje;
+        actualizarVistaPrevia();
+        
+        // Efecto visual en el botón seleccionado
+        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        setTimeout(() => {
+            this.classList.remove('selected');
+        }, 1000);
+    });
+});
+
+// Establecer fecha mínima como hoy
+const hoy = new Date().toISOString().split('T')[0];
+document.getElementById('fecha_inicio').min = hoy;
+document.getElementById('fecha_fin').min = hoy;
+
+// Validar que fecha fin sea posterior a fecha inicio
+document.getElementById('fecha_inicio').addEventListener('change', function() {
+    document.getElementById('fecha_fin').min = this.value;
+});
+
+// Contador de caracteres para el mensaje
+const textarea = document.getElementById('mensaje_personalizado');
+const contadorContainer = document.createElement('div');
+contadorContainer.className = 'character-counter';
+textarea.parentNode.appendChild(contadorContainer);
+
+textarea.addEventListener('input', function() {
+    const caracteres = this.value.length;
+    const limite = 1000; // Límite recomendado para WhatsApp
+    
+    contadorContainer.innerHTML = `
+        <small class="form-help ${caracteres > limite ? 'text-danger' : ''}">
+            ${caracteres}/${limite} caracteres ${caracteres > limite ? '(excede el límite recomendado)' : ''}
+        </small>
+    `;
+});
+
+// Inicializar vista previa
+actualizarVistaPrevia();
+actualizarPreviewFechas();
+
+// Efecto de auto-resize en textarea
+textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+</script>

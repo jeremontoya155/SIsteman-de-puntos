@@ -1,0 +1,162 @@
+<!-- Categorías Header -->
+<div class="categorias-header categoria-animate">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="categorias-title">
+                <i class="fas fa-tags me-3"></i>
+                Gestión de Categorías
+            </h1>
+            <p class="categorias-subtitle">Configura las categorías de clientes y sus beneficios</p>
+        </div>
+        <a href="/categorias/nueva" class="whatsapp-action-btn">
+            <i class="fas fa-plus me-2"></i>
+            Nueva Categoría
+        </a>
+    </div>
+</div>
+
+<% if (categorias.length === 0) { %>
+    <div class="empty-state categoria-animate">
+        <div class="empty-state-icon">
+            <i class="fas fa-tags"></i>
+        </div>
+        <h3 class="empty-state-title">No hay categorías configuradas</h3>
+        <p class="empty-state-description">
+            Las categorías te permiten segmentar clientes y asignar diferentes beneficios.<br>
+            Crea tu primera categoría para comenzar a organizar tus clientes.
+        </p>
+        <a href="/categorias/nueva" class="empty-state-btn">
+            <i class="fas fa-plus me-2"></i>
+            Crear Primera Categoría
+        </a>
+    </div>
+<% } else { %>
+    <div class="row">
+        <% categorias.forEach((categoria, index) => { %>
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="categoria-card categoria-animate" style="animation-delay: <%= (index * 0.1) %>s;">
+                    <div class="categoria-header">
+                        <div class="categoria-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <h5 class="categoria-name"><%= categoria.nombre %></h5>
+                        <p class="categoria-description">
+                            <% if (categoria.descripcion) { %>
+                                <%= categoria.descripcion %>
+                            <% } else { %>
+                                Categoría de cliente con beneficios especiales
+                            <% } %>
+                        </p>
+                        <div class="categoria-badge <%= categoria.activa ? 'activa' : 'inactiva' %>">
+                            <%= categoria.activa ? 'Activa' : 'Inactiva' %>
+                        </div>
+                    </div>
+                    
+                    <div class="categoria-body">
+                        <div class="categoria-stats">
+                            <div class="categoria-stat">
+                                <div class="categoria-stat-number">
+                                    <%= parseFloat(categoria.descuento_porcentaje).toFixed(1) %>%
+                                </div>
+                                <div class="categoria-stat-label">Descuento</div>
+                            </div>
+                            <div class="categoria-divider"></div>
+                            <div class="categoria-stat">
+                                <div class="categoria-stat-number">
+                                    <%= parseFloat(categoria.puntos_por_peso).toFixed(2) %>
+                                </div>
+                                <div class="categoria-stat-label">Puntos x Peso</div>
+                            </div>
+                        </div>
+                        
+                        <div class="categoria-actions">
+                            <button class="categoria-btn edit" onclick="editarCategoria(<%= categoria.id %>)">
+                                <i class="fas fa-edit me-1"></i>
+                                Editar
+                            </button>
+                            <button class="categoria-btn delete" onclick="eliminarCategoria(<%= categoria.id %>, '<%= categoria.nombre %>')">
+                                <i class="fas fa-trash me-1"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3 pt-3" style="border-top: 1px solid #dee2e6;">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Creada: <%= new Date(categoria.created_at).toLocaleDateString('es-ES') %>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+    
+    <div class="info-card categoria-animate" style="animation-delay: <%= (categorias.length * 0.1) %>s;">
+        <div class="info-card-header">
+            <h5 class="info-card-title">
+                <i class="fas fa-lightbulb me-2"></i>
+                ¿Cómo funcionan las categorías?
+            </h5>
+        </div>
+        <div class="info-card-body">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-percentage text-success"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Descuento Automático</h6>
+                    <small>Porcentaje de descuento que se aplica automáticamente en las compras</small>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-coins text-warning"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Puntos por Peso</h6>
+                    <small>Cantidad de puntos que el cliente gana por cada peso gastado</small>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn text-primary"></i>
+                </div>
+                <div class="feature-content">
+                    <h6>Promociones Segmentadas</h6>
+                    <small>Permite enviar promociones específicas a cada grupo de clientes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<script>
+function editarCategoria(id) {
+    window.location.href = `/categorias/editar/${id}`;
+}
+
+function eliminarCategoria(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar la categoría "${nombre}"?`)) {
+        fetch(`/categorias/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al eliminar la categoría: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error al eliminar la categoría: ' + error.message);
+        });
+    }
+}
+</script>

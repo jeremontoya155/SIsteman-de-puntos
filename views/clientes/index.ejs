@@ -1,0 +1,278 @@
+<!-- Clientes Header -->
+<div class="clientes-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="clientes-title">
+                <i class="fas fa-users me-3"></i>
+                Gestión de Clientes
+            </h1>
+            <p class="clientes-subtitle">Administra tu base de clientes y sus puntos</p>
+        </div>
+        <a href="/clientes/nuevo" class="new-client-btn">
+            <i class="fas fa-plus me-2"></i>
+            Nuevo Cliente
+        </a>
+    </div>
+</div>
+
+<!-- Mensaje de éxito -->
+<% if (typeof successMessage !== 'undefined' && successMessage) { %>
+<div class="alert alert-success cliente-animate" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    <%= successMessage %>
+</div>
+<% } %>
+
+<!-- Filtros de búsqueda -->
+<div class="filter-section">
+    <div class="filter-group">
+        <div class="filter-item">
+            <input type="text" id="buscarCliente" class="filter-input" placeholder="Buscar por nombre o teléfono...">
+            <i class="fas fa-search filter-icon"></i>
+        </div>
+        <div class="filter-item">
+            <select id="filtrarCategoria" class="filter-select">
+                <option value="">Todas las categorías</option>
+                <!-- Aquí se cargarían dinámicamente las categorías -->
+            </select>
+        </div>
+        <div class="filter-item">
+            <select id="filtrarEstado" class="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de clientes -->
+<div class="clientes-grid">
+    <% if (clientes.length === 0) { %>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h5>No hay clientes registrados</h5>
+            <p>Comienza añadiendo tu primer cliente al sistema</p>
+            <a href="/clientes/nuevo" class="empty-action-btn">
+                <i class="fas fa-plus me-2"></i>
+                Agregar Primer Cliente
+            </a>
+        </div>
+    <% } else { %>
+        <% clientes.forEach(cliente => { %>
+            <div class="cliente-card" data-categoria="<%= cliente.categoria_nombre || '' %>" data-estado="<%= cliente.activo ? 'activo' : 'inactivo' %>">
+                <div class="cliente-avatar">
+                    <span class="avatar-initials">
+                        <%= cliente.nombre.charAt(0).toUpperCase() %><%= cliente.apellido.charAt(0).toUpperCase() %>
+                    </span>
+                    <% if (cliente.activo) { %>
+                        <div class="status-indicator active"></div>
+                    <% } else { %>
+                        <div class="status-indicator inactive"></div>
+                    <% } %>
+                </div>
+                
+                <div class="cliente-info">
+                    <h5 class="cliente-name"><%= cliente.nombre %> <%= cliente.apellido %></h5>
+                    <div class="cliente-details">
+                        <div class="detail-item">
+                            <i class="fas fa-phone"></i>
+                            <span><%= cliente.telefono %></span>
+                        </div>
+                        <% if (cliente.email) { %>
+                            <div class="detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span><%= cliente.email %></span>
+                            </div>
+                        <% } %>
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Desde <%= new Date(cliente.created_at).toLocaleDateString('es-ES') %></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cliente-stats">
+                    <div class="stat-item points">
+                        <div class="stat-value"><%= parseFloat(cliente.puntos_acumulados).toFixed(0) %></div>
+                        <div class="stat-label">Puntos</div>
+                    </div>
+                    <div class="stat-item sales">
+                        <div class="stat-value">$<%= parseFloat(cliente.total_compras).toFixed(0) %></div>
+                        <div class="stat-label">Compras</div>
+                    </div>
+                </div>
+                
+                <div class="cliente-badges">
+                    <% if (cliente.categoria_nombre) { %>
+                        <span class="category-badge"><%= cliente.categoria_nombre %></span>
+                    <% } %>
+                    <% if (cliente.acepta_promociones) { %>
+                        <span class="promo-badge active">
+                            <i class="fas fa-bullhorn"></i>
+                            Promociones
+                        </span>
+                    <% } else { %>
+                        <span class="promo-badge inactive">
+                            <i class="fas fa-ban"></i>
+                            Sin promociones
+                        </span>
+                    <% } %>
+                </div>
+                
+                <div class="cliente-actions">
+                    <button class="action-btn edit" onclick="editarCliente(<%= cliente.id %>)">
+                        <i class="fas fa-edit"></i>
+                        Editar
+                    </button>
+                    <button class="action-btn whatsapp" onclick="enviarWhatsApp('<%= cliente.telefono %>')">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </button>
+                    <% if (cliente.activo) { %>
+                        <button class="action-btn deactivate" onclick="cambiarEstado(<%= cliente.id %>, false)">
+                            <i class="fas fa-user-slash"></i>
+                            Desactivar
+                        </button>
+                    <% } else { %>
+                        <button class="action-btn activate" onclick="cambiarEstado(<%= cliente.id %>, true)">
+                            <i class="fas fa-user-check"></i>
+                            Activar
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+
+<!-- Estadísticas resumen -->
+<% if (clientes.length > 0) { %>
+    <div class="stats-summary">
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value"><%= clientes.length %></div>
+                <div class="summary-label">Total Clientes</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value"><%= clientes.reduce((sum, c) => sum + parseFloat(c.puntos_acumulados), 0).toFixed(0) %></div>
+                <div class="summary-label">Puntos Totales</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value">$<%= clientes.reduce((sum, c) => sum + parseFloat(c.total_compras), 0).toFixed(0) %></div>
+                <div class="summary-label">Ventas Totales</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="summary-content">
+                <div class="summary-value"><%= clientes.filter(c => c.activo).length %></div>
+                <div class="summary-label">Clientes Activos</div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<script>
+// Funciones JavaScript para la funcionalidad
+function editarCliente(id) {
+    window.location.href = `/clientes/editar/${id}`;
+}
+
+function enviarWhatsApp(telefono) {
+    const mensaje = encodeURIComponent('¡Hola! Te escribimos desde nuestro sistema de puntos. ¿Cómo podemos ayudarte hoy?');
+    window.open(`https://wa.me/${telefono}?text=${mensaje}`, '_blank');
+}
+
+function cambiarEstado(id, activo) {
+    if (confirm(`¿Estás seguro de ${activo ? 'activar' : 'desactivar'} este cliente?`)) {
+        // Aquí iría la llamada AJAX para cambiar el estado
+        fetch(`/clientes/${id}/estado`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ activo })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al cambiar el estado del cliente');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cambiar el estado del cliente');
+        });
+    }
+}
+
+// Filtrado en tiempo real
+document.getElementById('buscarCliente').addEventListener('input', function() {
+    const busqueda = this.value.toLowerCase();
+    const tarjetas = document.querySelectorAll('.cliente-card');
+    
+    tarjetas.forEach(tarjeta => {
+        const nombre = tarjeta.querySelector('.cliente-name').textContent.toLowerCase();
+        const telefono = tarjeta.querySelector('.detail-item span').textContent.toLowerCase();
+        
+        if (nombre.includes(busqueda) || telefono.includes(busqueda)) {
+            tarjeta.style.display = 'block';
+        } else {
+            tarjeta.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('filtrarCategoria').addEventListener('change', function() {
+    const categoria = this.value;
+    const tarjetas = document.querySelectorAll('.cliente-card');
+    
+    tarjetas.forEach(tarjeta => {
+        const categoriaCliente = tarjeta.dataset.categoria;
+        
+        if (!categoria || categoriaCliente === categoria) {
+            tarjeta.style.display = 'block';
+        } else {
+            tarjeta.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('filtrarEstado').addEventListener('change', function() {
+    const estado = this.value;
+    const tarjetas = document.querySelectorAll('.cliente-card');
+    
+    tarjetas.forEach(tarjeta => {
+        const estadoCliente = tarjeta.dataset.estado;
+        
+        if (!estado || estadoCliente === estado) {
+            tarjeta.style.display = 'block';
+        } else {
+            tarjeta.style.display = 'none';
+        }
+    });
+});
+</script>

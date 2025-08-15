@@ -1,0 +1,583 @@
+/* Nueva Promoción Form Styles - Diseño Mejorado */
+
+/* Header de la página */
+.nueva-promocion-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 20px;
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+}
+
+.nueva-promocion-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+    transform: rotate(25deg);
+    animation: float 6s ease-in-out infinite;
+}
+
+.nueva-promocion-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.nueva-promocion-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.back-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 3;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* Container del formulario */
+.promocion-form-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.promocion-form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.promocion-form {
+    padding: 0;
+}
+
+/* Alertas */
+.form-alert {
+    margin: 2rem 2rem 0 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+}
+
+.form-alert.error {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+}
+
+/* Secciones del formulario */
+.form-section {
+    padding: 2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-header {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: #f093fb;
+    font-size: 1.1rem;
+}
+
+/* Grid del formulario */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+/* Grupos de formulario */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: 14px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    font-family: inherit;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #f093fb;
+    box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+    background: white;
+    transform: translateY(-1px);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+.whatsapp-textarea {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e8 100%);
+    border: 2px solid #25d366;
+    border-radius: 15px;
+}
+
+.whatsapp-textarea:focus {
+    border-color: #128c7e;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+.form-help code {
+    background: #f1f3f4;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #e91e63;
+}
+
+/* Preview de fechas */
+.date-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.date-start,
+.date-end {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.date-separator {
+    color: rgba(255,255,255,0.7);
+}
+
+/* Plantillas de mensaje */
+.templates-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.templates-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.template-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.template-btn:hover {
+    border-color: #f093fb;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.3);
+}
+
+.template-btn.selected {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.template-btn i {
+    font-size: 1.2rem;
+}
+
+/* Vista previa de WhatsApp */
+.whatsapp-preview-section {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    padding: 2rem;
+    color: white;
+}
+
+.preview-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.preview-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.whatsapp-preview-container {
+    max-width: 350px;
+    margin: 0 auto;
+    background: #ece5dd;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.whatsapp-header {
+    background: #075e54;
+    padding: 1rem;
+    color: white;
+}
+
+.whatsapp-contact {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.contact-avatar {
+    width: 40px;
+    height: 40px;
+    background: #25d366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.contact-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.contact-status {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.whatsapp-messages {
+    padding: 1rem;
+    min-height: 150px;
+}
+
+.whatsapp-message {
+    background: #dcf8c6;
+    padding: 0.75rem 1rem;
+    border-radius: 18px 18px 4px 18px;
+    margin-bottom: 0.5rem;
+    max-width: 85%;
+    margin-left: auto;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message-content {
+    line-height: 1.4;
+}
+
+.message-title {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.message-text {
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+.message-time {
+    text-align: right;
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+/* Sección de información */
+.info-section {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    padding: 2rem;
+    color: white;
+}
+
+.info-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.info-content h6 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.info-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-content li {
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.info-content li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #00d2d3;
+    font-weight: bold;
+}
+
+/* Botones de acción */
+.form-actions {
+    padding: 2rem;
+    background: #f8f9fa;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.cancel-btn,
+.submit-btn {
+    padding: 14px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* Contador de caracteres */
+.character-counter {
+    margin-top: 0.5rem;
+}
+
+.character-counter .text-danger {
+    color: #dc3545 !important;
+}
+
+/* Animaciones */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(25deg); }
+    50% { transform: translateY(-10px) rotate(25deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.promocion-form-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nueva-promocion-header {
+        padding: 1.5rem;
+    }
+    
+    .nueva-promocion-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+    
+    .nueva-promocion-title {
+        font-size: 1.8rem;
+    }
+    
+    .back-btn {
+        align-self: stretch;
+        text-align: center;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    .templates-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+    
+    .cancel-btn,
+    .submit-btn {
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .whatsapp-preview-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .nueva-promocion-header {
+        padding: 1rem;
+    }
+    
+    .nueva-promocion-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .form-actions {
+        padding: 1rem;
+    }
+}
