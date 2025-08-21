@@ -1,0 +1,276 @@
+<!-- Editar Cliente Header -->
+<div class="nuevo-cliente-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="nuevo-cliente-title">
+                <i class="fas fa-user-edit me-3"></i>
+                Editar Cliente
+            </h1>
+            <p class="nuevo-cliente-subtitle">Modifica la información del cliente</p>
+        </div>
+        <a href="/clientes" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>
+            Volver a Lista
+        </a>
+    </div>
+</div>
+
+<!-- Formulario de editar cliente -->
+<div class="cliente-form-container">
+    <div class="cliente-form-card">
+        <% if (error) { %>
+            <div class="form-alert error">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form method="POST" action="/clientes/editar/<%= cliente.id %>" class="cliente-form">
+            <!-- Avatar Preview -->
+            <div class="avatar-preview-section">
+                <div class="avatar-preview" id="avatarPreview">
+                    <span class="avatar-initials" id="avatarInitials">
+                        <%= cliente.nombre.charAt(0).toUpperCase() %><%= cliente.apellido.charAt(0).toUpperCase() %>
+                    </span>
+                </div>
+                <div class="avatar-info">
+                    <h6>Vista previa del avatar</h6>
+                    <p>Se actualizará automáticamente con las iniciales</p>
+                </div>
+            </div>
+            
+            <!-- Información Personal -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Información Personal
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">Nombre *</label>
+                        <input type="text" class="form-input" id="nombre" name="nombre" 
+                               placeholder="Ingresa el nombre" 
+                               value="<%= cliente.nombre %>"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apellido" class="form-label">Apellido *</label>
+                        <input type="text" class="form-input" id="apellido" name="apellido" 
+                               placeholder="Ingresa el apellido" 
+                               value="<%= cliente.apellido %>"
+                               required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                        <input type="date" class="form-input" id="fecha_nacimiento" name="fecha_nacimiento"
+                               value="<%= cliente.fecha_nacimiento ? new Date(cliente.fecha_nacimiento).toISOString().split('T')[0] : '' %>">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de Contacto -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-address-book"></i>
+                        Información de Contacto
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="telefono" class="form-label">Teléfono WhatsApp *</label>
+                        <div class="input-with-icon">
+                            <i class="fab fa-whatsapp input-icon"></i>
+                            <input type="tel" class="form-input" id="telefono" name="telefono" 
+                                   placeholder="+5491123456789" 
+                                   value="<%= cliente.telefono %>"
+                                   required>
+                        </div>
+                        <small class="form-help">Incluye código de país para WhatsApp</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email (Opcional)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="form-input" id="email" name="email" 
+                                   placeholder="cliente@email.com"
+                                   value="<%= cliente.email || '' %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Configuración del Cliente -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Configuración de Cliente
+                    </h5>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="categoria_id" class="form-label">Categoría del Cliente *</label>
+                        <select class="form-select" id="categoria_id" name="categoria_id" required>
+                            <option value="">Seleccionar categoría...</option>
+                            <% categorias.forEach(categoria => { %>
+                                <option value="<%= categoria.id %>" 
+                                        data-descuento="<%= categoria.descuento_porcentaje %>"
+                                        data-puntos="<%= categoria.puntos_por_peso %>"
+                                        <%= cliente.categoria_id == categoria.id ? 'selected' : '' %>>
+                                    <%= categoria.nombre %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <small class="form-help">La categoría determina los descuentos y puntos que recibe</small>
+                        
+                        <div class="categoria-preview" id="categoriaPreview" style="<%= cliente.categoria_id ? 'display: flex;' : 'display: none;' %>">
+                            <div class="preview-item">
+                                <i class="fas fa-percentage text-primary"></i>
+                                <span>Descuento: <strong id="previewDescuento">0%</strong></span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-star text-warning"></i>
+                                <span>Puntos por peso: <strong id="previewPuntos">0</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preferencias -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-bell"></i>
+                        Preferencias de Comunicación
+                    </h5>
+                </div>
+                
+                <div class="preferences-group">
+                    <label class="preference-item <%= cliente.acepta_promociones ? 'active' : '' %>">
+                        <input type="checkbox" class="preference-checkbox" id="acepta_promociones" 
+                               name="acepta_promociones" 
+                               <%= cliente.acepta_promociones ? 'checked' : '' %>>
+                        <div class="preference-content">
+                            <div class="preference-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="preference-text">
+                                <h6>Promociones por WhatsApp</h6>
+                                <p>El cliente recibirá mensajes promocionales y ofertas especiales</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="info-section">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="info-content">
+                        <h6>Información del cliente</h6>
+                        <ul>
+                            <li>Puntos actuales: <strong><%= parseFloat(cliente.puntos_acumulados || 0).toFixed(0) %></strong></li>
+                            <li>Total compras: <strong>$<%= parseFloat(cliente.total_compras || 0).toFixed(0) %></strong></li>
+                            <li>Cliente desde: <strong><%= new Date(cliente.created_at).toLocaleDateString('es-ES') %></strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions">
+                <a href="/clientes" class="cancel-btn">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </a>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save me-2"></i>
+                    Actualizar Cliente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Actualizar avatar preview cuando cambie nombre o apellido
+function updateAvatarPreview() {
+    const nombre = document.getElementById('nombre').value;
+    const apellido = document.getElementById('apellido').value;
+    const avatarInitials = document.getElementById('avatarInitials');
+    
+    if (nombre && apellido) {
+        avatarInitials.textContent = nombre.charAt(0).toUpperCase() + apellido.charAt(0).toUpperCase();
+    } else if (nombre) {
+        avatarInitials.textContent = nombre.charAt(0).toUpperCase();
+    } else {
+        avatarInitials.textContent = '?';
+    }
+}
+
+document.getElementById('nombre').addEventListener('input', updateAvatarPreview);
+document.getElementById('apellido').addEventListener('input', updateAvatarPreview);
+
+// Mostrar preview de categoría
+document.getElementById('categoria_id').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const preview = document.getElementById('categoriaPreview');
+    
+    if (selectedOption.value) {
+        const descuento = selectedOption.dataset.descuento;
+        const puntos = selectedOption.dataset.puntos;
+        
+        document.getElementById('previewDescuento').textContent = descuento + '%';
+        document.getElementById('previewPuntos').textContent = puntos;
+        
+        preview.style.display = 'flex';
+    } else {
+        preview.style.display = 'none';
+    }
+});
+
+// Inicializar preview de categoría si hay una seleccionada
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.getElementById('categoria_id');
+    if (categoriaSelect.value) {
+        const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
+        document.getElementById('previewDescuento').textContent = selectedOption.dataset.descuento + '%';
+        document.getElementById('previewPuntos').textContent = selectedOption.dataset.puntos;
+    }
+});
+
+// Efecto visual en checkbox de preferencias
+document.getElementById('acepta_promociones').addEventListener('change', function() {
+    const preferenceItem = this.closest('.preference-item');
+    if (this.checked) {
+        preferenceItem.classList.add('active');
+    } else {
+        preferenceItem.classList.remove('active');
+    }
+});
+
+// Validación de teléfono
+document.getElementById('telefono').addEventListener('input', function() {
+    const telefono = this.value;
+    const regex = /^\+\d{1,3}\d{10,}$/;
+    
+    if (telefono && !regex.test(telefono)) {
+        this.setCustomValidity('Formato inválido. Debe incluir código de país (+54911...)');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+</script>

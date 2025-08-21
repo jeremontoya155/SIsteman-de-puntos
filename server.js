@@ -255,6 +255,102 @@ app.post('/clientes', requireAuth, async (req, res) => {
     }
 });
 
+// Ruta para editar cliente (GET)
+app.get('/clientes/editar/:id', requireAuth, async (req, res) => {
+    const clienteId = req.params.id;
+    
+    try {
+        const [clienteResult, categoriasResult] = await Promise.all([
+            pool.query('SELECT * FROM clientes WHERE id = $1', [clienteId]),
+            pool.query('SELECT * FROM categorias WHERE activa = true ORDER BY nombre')
+        ]);
+        
+        if (clienteResult.rows.length === 0) {
+            return res.redirect('/clientes?error=Cliente no encontrado');
+        }
+        
+        res.render('clientes/editar', {
+            cliente: clienteResult.rows[0],
+            categorias: categoriasResult.rows,
+            error: null,
+            currentPage: 'clientes'
+        });
+    } catch (err) {
+        console.error('Error obteniendo cliente:', err);
+        res.redirect('/clientes?error=Error cargando cliente');
+    }
+});
+
+// Ruta para actualizar cliente (POST)
+app.post('/clientes/editar/:id', requireAuth, async (req, res) => {
+    const clienteId = req.params.id;
+    const { nombre, apellido, telefono, email, fecha_nacimiento, categoria_id, acepta_promociones } = req.body;
+    
+    try {
+        // Verificar que el teléfono no esté ya registrado por otro cliente
+        const existingPhone = await pool.query('SELECT id FROM clientes WHERE telefono = $1 AND id != $2', [telefono, clienteId]);
+        if (existingPhone.rows.length > 0) {
+            throw new Error('Este número de teléfono ya está registrado por otro cliente');
+        }
+        
+        await pool.query(`
+            UPDATE clientes 
+            SET nombre = $1, apellido = $2, telefono = $3, email = $4, 
+                fecha_nacimiento = $5, categoria_id = $6, acepta_promociones = $7,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $8
+        `, [nombre, apellido, telefono, email || null, fecha_nacimiento || null, categoria_id || null, acepta_promociones === 'on', clienteId]);
+        
+        res.redirect('/clientes?success=Cliente actualizado exitosamente');
+        
+    } catch (err) {
+        console.error('Error actualizando cliente:', err);
+        
+        try {
+            const [clienteResult, categoriasResult] = await Promise.all([
+                pool.query('SELECT * FROM clientes WHERE id = $1', [clienteId]),
+                pool.query('SELECT * FROM categorias WHERE activa = true ORDER BY nombre')
+            ]);
+            
+            res.render('clientes/editar', {
+                cliente: clienteResult.rows[0],
+                categorias: categoriasResult.rows,
+                error: err.message,
+                currentPage: 'clientes'
+            });
+        } catch (dbErr) {
+            res.redirect('/clientes?error=Error actualizando cliente');
+        }
+    }
+});
+
+// Ruta para cambiar estado del cliente (PUT)
+app.put('/clientes/:id/estado', requireAuth, async (req, res) => {
+    const clienteId = req.params.id;
+    const { activo } = req.body;
+    
+    try {
+        await pool.query('UPDATE clientes SET activo = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [activo, clienteId]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error cambiando estado:', err);
+        res.json({ success: false, error: err.message });
+    }
+});
+
+// Ruta para eliminar cliente (DELETE)
+app.delete('/clientes/:id', requireAuth, async (req, res) => {
+    const clienteId = req.params.id;
+    
+    try {
+        await pool.query('DELETE FROM clientes WHERE id = $1', [clienteId]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error eliminando cliente:', err);
+        res.json({ success: false, error: err.message });
+    }
+});
+
 // RUTAS DE CATEGORÍAS
 app.get('/categorias', requireAuth, async (req, res) => {
     try {

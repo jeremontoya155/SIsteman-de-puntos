@@ -142,6 +142,10 @@
                             Activar
                         </button>
                     <% } %>
+                    <button class="action-btn delete" onclick="eliminarCliente(<%= cliente.id %>, '<%= cliente.nombre %>')">
+                        <i class="fas fa-trash"></i>
+                        Eliminar
+                    </button>
                 </div>
             </div>
         <% }); %>
@@ -225,6 +229,29 @@ function cambiarEstado(id, activo) {
         .catch(error => {
             console.error('Error:', error);
             alert('Error al cambiar el estado del cliente');
+        });
+    }
+}
+
+function eliminarCliente(id, nombre) {
+    if (confirm(`¿Estás seguro de eliminar al cliente "${nombre}"? Esta acción no se puede deshacer.`)) {
+        fetch(`/clientes/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al eliminar el cliente: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar el cliente');
         });
     }
 }
